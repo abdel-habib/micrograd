@@ -16,10 +16,10 @@ class Value():
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), '+')
-        
+
         def _backward():
-            self.grad += 1.0 * out.grad
-            other.grad += 1.0 * out.grad
+            self.grad += out.grad
+            other.grad += out.grad
         out._backward = _backward
 
         return out
@@ -27,12 +27,12 @@ class Value():
     def __mul__(self, other):
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data * other.data, (self, other), '*')
-        
+
         def _backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
         out._backward = _backward
-        
+
         return out
     
     def __pow__(self, other):
@@ -47,6 +47,9 @@ class Value():
     
     def __rmul__(self, other): # other * self
         return self * other
+    
+    def __radd__(self, other): # other + self
+        return self + other
     
     def __truediv__(self, other): # self / other
         return self * other**-1
